@@ -15,9 +15,13 @@ The @Async annotated methods can return CompletableFuture to hold the result of 
 
 What is CompletableFuture ?
 ------------------------------------------------------------------------------------------------------------
-A CompltableFuture is used for asynchronous programming. Asynchronous programming means writing non-blocking code. It runs a task on a separate thread than the main application thread and notifies the main thread about its progress, completion or failure.
+CompletableFuture is used for asynchronous programming in Java. Asynchronous programming means writing non-blocking code by running a task on a separate thread than the main application thread and notifying the main thread about its progress, completion or failure.
+
+It runs a task on a separate thread than the main application thread and notifies the main thread about its progress, completion or failure.
 
 In this way, the main thread does not block or wait for the completion of the task. Other tasks execute in parallel. Parallelism improves the performance of the program.
+
+Having this kind of parallelism greatly improves the performance of your programs.
 
 A CompletableFuture is a class in Java. It belongs to java.util.cocurrent package. It implements CompletionStage and Future interface.
 
@@ -107,6 +111,55 @@ STEP-3 : Create @Async Rest Controllers :
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
+Read CSV File to Generate List of Customer Objects :
+----------------------------------------------------------------------------------------------------------
+	import java.io.BufferedReader;
+	import java.io.IOException;
+	import java.io.InputStreamReader;
+	import java.util.ArrayList;
+	import java.util.List;
+
+	import org.springframework.web.multipart.MultipartFile;
+
+	import com.spring.async.model.Customer;
+
+	import lombok.extern.slf4j.Slf4j;
+
+	@Slf4j
+	public class CSVOperation 
+	{
+	public static List<Customer> parseCSVFile(MultipartFile file)
+	{
+		final List<Customer> customers = new ArrayList<>();		
+	try 
+	{
+	    try (final BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) 
+	    {
+		String line;
+
+		while ((line = br.readLine()) != null) 
+		{
+		    final String[] data = line.split(",");
+
+		    final Customer customer = new Customer();
+
+		    customer.setName(data[0]);
+		    customer.setGender(data[1]);
+		    customer.setEmail(data[2]);
+		    customer.setMobile(data[3]);
+		    customers.add(customer);
+		}
+		return customers;
+	    }
+	} 
+	catch (final IOException e) 
+	{
+	    log.error("Failed to parse CSV file {}", e);
+	}
+		return customers;
+	}
+	}
+------------------------------------------------------------------------------------------------------
 # Exception Handling :
 ------------------------------------------------------------------------------------------------------
 1) If you get AsyncRequestTimeoutException :
